@@ -14,20 +14,22 @@ import {
 } from "./styles";
 
 const Login = () => {
-  const [{ isCreating }, login] = useApi.post('auth/signin');
-  const navigate = useNavigate()
-
-  const handleOnSubmit = async (values) => {
-    try {
-      const res = await login({
-        ...values
-      })
+  const { mutate: login, isLoading } = useApi.post('auth/signin', {
+    onSuccess: (res) => {
       toast.success('Sign in is successfull.');
       storeAuthToken(res.data.accessToken)
       navigate('/')
-    } catch (error) {
+    },
+    onError: (error) =>{
       toast.error(error)
     }
+  });
+  const navigate = useNavigate()
+
+  const handleOnSubmit = (values) => {
+    login({
+      ...values
+    })
   }
 
   return (
@@ -54,7 +56,7 @@ const Login = () => {
               type="password"
             />
             <Actions>
-              <Button type="submit" variant="primary" isWorking={isCreating}>
+              <Button type="submit" variant="primary" isWorking={isLoading}>
                 Sign in
               </Button>
             </Actions>

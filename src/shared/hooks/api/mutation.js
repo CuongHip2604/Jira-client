@@ -1,48 +1,33 @@
-import { useCallback } from 'react';
 
-import api from 'shared/utils/api';
-import useMergeState from 'shared/hooks/mergeState';
+import { useMutation } from "@tanstack/react-query";
+import api from "shared/utils/api";
 
-const useMutation = (method, url) => {
-  const [state, mergeState] = useMergeState({
-    data: null,
-    error: null,
-    isWorking: false,
-  });
+const useClientMutation = (method, url, {
+  onSuccess,
+  onError
+}) => {
+  const makeRequest = (body) => {
+    return new Promise((resolve, reject) => {
 
-  const makeRequest = useCallback(
-    (variables = {}) =>
-    new Promise((resolve, reject) => {
-        mergeState({ isWorking: true });
+      api[method](url, body).then(
+        (data) => {
+          resolve(data);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+  };
 
-        api[method](url, variables).then(
-          data => {
-            resolve(data);
-            mergeState({ data, error: null, isWorking: false });
-          },
-          error => {
-            reject(error);
-            mergeState({ error, data: null, isWorking: false });
-          },
-        );
-      }),
-    [method, url, mergeState],
-  );
-
-  return [
-    {
-      ...state,
-      [isWorkingAlias[method]]: state.isWorking,
+  return useMutation((body) => makeRequest(body), {
+    onError: (err) => {
+      onError(err)
     },
-    makeRequest,
-  ];
+    onSuccess: (res) => {
+      onSuccess(res)
+    },
+  });
 };
 
-const isWorkingAlias = {
-  post: 'isCreating',
-  put: 'isUpdating',
-  patch: 'isUpdating',
-  delete: 'isDeleting',
-};
-
-export default useMutation;
+export default useClientMutation;

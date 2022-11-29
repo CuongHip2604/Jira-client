@@ -36,7 +36,9 @@ const fontIconCodes = {
   [`calendar`]: '\\e91d',
   [`arrow-left`]: '\\e91e',
   [`arrow-right`]: '\\e91f',
-  [`pencil`]: '\\f099'
+  [`pencil`]: '\\e920',
+  [`eye`]: '\\e9ce',
+  [`eye-blocked`]: '\\e9d1'
 };
 
 const propTypes = {

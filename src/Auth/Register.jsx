@@ -13,19 +13,21 @@ import {
 } from "./styles";
 
 const Register = () => {
-  const [{ isCreating }, register] = useApi.post('auth/signup');
-  const navigate = useNavigate()
-
-  const handleOnSubmit = async (values) => {
-    try {
-      await register({
-        ...values
-      })
+  const { mutate: register, isLoading } = useApi.post('auth/signup', {
+    onSuccess: () => {
       toast.success('Sign in is successfull.');
       navigate('/auth/login')
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error(error)
     }
+  });
+  const navigate = useNavigate()
+
+  const handleOnSubmit = (values) => {
+    register({
+      ...values
+    })
   }
 
   return (
@@ -66,7 +68,7 @@ const Register = () => {
               type="password"
             />
             <Actions>
-              <Button type="submit" variant="primary" isWorking={isCreating}>
+              <Button type="submit" variant="primary" isWorking={isLoading}>
                 Sign up
               </Button>
             </Actions>

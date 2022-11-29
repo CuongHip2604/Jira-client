@@ -1,12 +1,27 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
-import Login from "Auth/Login";
 import CheckIsLogged from "./CheckIsLogged";
-import Project from "Project";
 import ProtectRoute from "./ProtectedRoute";
-import Register from "Auth/Register";
-import ProjectList from "Project/ProjectList";
+import { PageLoader } from "shared/components";
+
+const Loader = (Component) => (props) =>
+  (
+    <Suspense
+      fallback={
+        <PageLoader />
+      }
+    >
+      <Component {...props} />
+    </Suspense>
+  );
+
+const Login  = Loader(lazy(() => import("Auth/Login")));
+const Project  = Loader(lazy(() => import("Project")));
+const Register  = Loader(lazy(() => import("Auth/Register")));
+const ProjectList  = Loader(lazy(() => import("Project/ProjectList")));
+const ProjectBoard  = Loader(lazy(() => import("Project/Board")));
+
+
 
 const RouterC = () => (
   <BrowserRouter>
@@ -22,6 +37,7 @@ const RouterC = () => (
       <Route element={<ProtectRoute />}>
         <Route path="/project" element={<Project />}>
           <Route index element={<ProjectList />} />
+          <Route path=":id/board" element={<ProjectBoard />} />
         </Route>
       </Route>
     </Routes>

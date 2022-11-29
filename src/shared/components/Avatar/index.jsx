@@ -25,13 +25,21 @@ const Avatar = ({ className, avatarUrl, name, size, ...otherProps }) => {
     ...otherProps,
   };
 
+  const cenvertName = (name) => {
+    const arrName = name.split(' ')
+    const firstName = arrName[0]
+    const lastName = arrName[arrName.length - 1]
+    
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`
+  }
+
   if (avatarUrl) {
     return <Image avatarUrl={avatarUrl} {...sharedProps} />;
   }
 
   return (
     <Letter color={getColorFromName(name)} {...sharedProps}>
-      <span>{name.charAt(0)}</span>
+      <span>{cenvertName(name)}</span>
     </Letter>
   );
 };

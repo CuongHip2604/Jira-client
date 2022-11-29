@@ -26,11 +26,13 @@ export default function Table({ columns, data }) {
                 // Loop over the headers in each row
                 headerGroup.headers.map((column, columnIdx) => (
                   // Apply the header cell props
-                  <th key={columnIdx} {...column.getHeaderProps(
-                    {
+                  <th
+                    key={columnIdx}
+                    {...column.getHeaderProps({
                       style: { minWidth: column.minWidth, width: column.width },
-                    }
-                  )}>
+                      className: column.className,
+                    })}
+                  >
                     {
                       // Render the header
                       column.render("Header")

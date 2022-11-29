@@ -1,25 +1,25 @@
-import { useMemo, useState } from "react";
-import { Breadcrumbs, Icon, InputDebounced, Select, Table } from "shared/components";
+import { useEffect, useMemo, useState } from "react";
+import { Avatar, Breadcrumbs, Icon, InputDebounced, Select, Table } from "shared/components";
 import { formatDateTimeForAPI } from "shared/utils/dateTime";
-import { Actions, ClearAll, Filters, TableContainer } from "./Styles";
+import { Actions, ClearAll, Filters, TableContainer, UserChip, UserGroup } from "./Styles";
+import useApi from 'shared/hooks/api'
+import { Link } from "react-router-dom";
 
 export default function ProjectList() {
   const [searchTerm, setDearchTerm] = useState("");
   const areFiltersCleared = !searchTerm;
-
-  const onEdit = (value) => {
-    console.log(444, value);
-  }
-
-  const onDelete = (value) => {
-    console.log(555, value);
-  }
+  const [dataTable, setDataTable] = useState([])
 
   const columns = useMemo(
     () => [
       {
         Header: "ID",
         accessor: "id",
+        width: '50px',
+        minWidth: "50px",
+        Cell: ({ value }) => {
+          return <Link style={{ textDecoration: 'underline' }} to={`/project/${value}/board`}>{value}</Link>
+        }
       },
       {
         Header: "Project name",
@@ -28,17 +28,31 @@ export default function ProjectList() {
       {
         Header: "Category",
         accessor: "category",
+        Cell: ({ value }) => {
+          return <div style={{ textTransform: 'capitalize' }}>{value}</div>
+        }
       },
       {
         Header: "Owner",
         accessor: "owner",
+        Cell: ({ value }) => {
+          return <UserChip>{ value }</UserChip>
+        },
+        minWidth: 150
       },
       {
         Header: "Members",
         accessor: "users",
         Cell: ({ value }) => {
-          return value.map(el => <div key={el.id}>{el.name}</div>)
-        }
+          return <UserGroup>
+            {
+              value.splice(0, 2).map((el) => {
+                return <Avatar key={el.id} name={el.name} />
+              })
+            }
+          </UserGroup>
+        },
+        className: 'text-center'
       },
       {
         Header: "Updated at",
@@ -62,56 +76,35 @@ export default function ProjectList() {
             <Icon type='trash' onClick={() => onDelete(values)} />
           </Actions>
         },
+        className: 'text-center'
       },
     ],
     []
   );
 
-  const data = useMemo(
-    () => [
-      {
-        id: 23,
-        name: "Project 3",
-        description: "description",
-        category: "marketing",
-        status: "active",
-        owner: 17,
-        createdAt: "2022-11-25T01:58:20.232Z",
-        updatedAt: "2022-11-25T01:58:20.232Z",
-        users: [
+  const { data: response } = useApi.get('project', { limit: 10, page: 1 })
+
+  useEffect(() => {
+    if (response) {
+      const { data } = response
+      if (data && data.length) {
+        setDataTable(data.map(el => (
           {
-            id: 17,
-            name: "cuong nguyen",
-            avatarUrl: null,
-            email: "cuong@grr.la",
-            createdAt: "2022-11-24T21:39:37.012Z",
-            updatedAt: "2022-11-25T03:38:36.161Z",
-          },
-        ],
-      },
-      {
-        id: 24,
-        name: "Project 4",
-        description: "description",
-        category: "marketing",
-        status: "active",
-        owner: 17,
-        createdAt: "2022-11-25T03:45:31.600Z",
-        updatedAt: "2022-11-25T03:45:31.600Z",
-        users: [
-          {
-            id: 17,
-            name: "cuong nguyen",
-            avatarUrl: null,
-            email: "cuong@grr.la",
-            createdAt: "2022-11-24T21:39:37.012Z",
-            updatedAt: "2022-11-25T03:38:36.161Z",
-          },
-        ],
-      },
-    ],
-    []
-  );
+            ...el,
+            owner: el.users.find(item => item.id === el.ownerId).name || null
+          }
+        )))
+      }
+    }
+  }, [response])
+
+  const onEdit = (value) => {
+    console.log(444, value);
+  }
+
+  const onDelete = (value) => {
+    console.log(555, value);
+  }
 
   return (
     <>
@@ -142,7 +135,7 @@ export default function ProjectList() {
         )}
       </Filters>
       <TableContainer>
-        <Table data={data} columns={columns} />
+        <Table data={dataTable} columns={columns} />
       </TableContainer>
     </>
   );

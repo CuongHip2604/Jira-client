@@ -32,3 +32,22 @@ export const Actions = styled.div`
     cursor: pointer;
   }
 `
+
+export const UserChip = styled.span`
+  padding: 8px;
+  border: 1px solid ${color.backgroundLightPrimary};
+  border-radius: 4px;
+  background-color: ${color.backgroundLightPrimary};
+  text-transform: capitalize;
+`
+
+export const UserGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  div {
+    margin-left: -4px;
+    border: 1px solid ${color.white};
+  }
+`

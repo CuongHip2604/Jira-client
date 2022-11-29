@@ -19,7 +19,7 @@ export const Letter = styled.div`
   color: #fff;
   background: ${props => props.color};
   ${font.medium}
-  ${props => font.size(Math.round(props.size / 1.7))}
+  ${props => font.size(Math.round(props.size / 2.6))}
   & > span {
     display: flex;
     align-items: center;

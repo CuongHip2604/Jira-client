@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import history from 'browserHistory';
 import { getStoredAuthToken, removeStoredAuthToken } from 'shared/utils/authToken';
 import toast from 'shared/utils/toast';
 
@@ -32,9 +31,9 @@ const api = (method, url, variables) =>
       },
       error => {
         if (error.response) {
-          if (error.response.data.error.code === 'INVALID_TOKEN') {
+          if (error.response.status === 401) {
             removeStoredAuthToken();
-            history.push('/auth/login');
+            window.location.reload()
           } else {
             reject(error.response.data.message);
           }
